@@ -1,0 +1,9 @@
+[submodule "bigpy"]
+	path = bigpy
+	url = git@github.com:harperreed/bigpy.git
+[submodule "big-pptx"]
+	path = big-pptx
+	url = git@github.com:harperreed/big-pptx.git
+[submodule "big-renderer"]
+	path = big-renderer
+	url = git@github.com:harperreed/big-renderer.git
