@@ -44,8 +44,13 @@ def main():
     options.directory_name = options.slug + "-"+options.width+"x"+options.height
     options.exec_path = os.path.dirname(__file__)
 
+    if options.action == "generate-html":
+        logging.info("Generating HTML")
+        cmd = "python "+options.exec_path+"/bigpy/big.py -s "+options.name +".md"
 
-    if options.action == "generate-slides":
+        os.system(cmd)
+
+    elif options.action == "generate-slides":
         logging.info("Generating slide images")
 
         logging.debug("Settings")
