@@ -43,7 +43,6 @@ def main():
     options.slug = slugify(unicode(options.name), separator="_")
     options.directory_name = options.slug + "-"+options.width+"x"+options.height
     options.exec_path = os.path.dirname(__file__)
-    print options.exec_path
 
 
     if options.action == "generate-slides":
@@ -58,7 +57,6 @@ def main():
 
         logging.info("Downloading " + options.url)
         logging.info("Saving images ")
-        
 
         if not os.path.exists(options.directory_name):
             os.makedirs(options.directory_name)
@@ -68,8 +66,10 @@ def main():
         
         os.system(cmd)
     elif options.action == "generate-pptx":
-        print "pptx"
-        #python /Users/harper/Dropbox/Documents/talks/bin/preso_gen.py -r ./ -s ./$(VAR)_-1920x1080/ --name $(VAR)
+        logging.info("Generating PDF")
+        cmd = "python "+options.exec_path+"/big-pptx/images_to_pptx.py -r ./ -s ./"+options.directory_name+"/ --name "+options.name
+        os.system(cmd)
+
 
 if __name__ == '__main__':
     main()
