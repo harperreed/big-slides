@@ -1,78 +1,56 @@
-#!/usr/bin/env python
-# encoding: utf-8
+#!/usr/bin/env python3
 
 import logging
-import markdown2
-from optparse import OptionParser
-import re
-import sys
 import os
-
+import subprocess
+import argparse
 from slugify import slugify
 
-logging.basicConfig(format="%(message)s",level=logging.INFO)
+logging.basicConfig(format="%(message)s", level=logging.INFO)
 
 
 def main():
-    parser = OptionParser()
-    parser.add_option("-a", "--action", dest="action",)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--action", dest="action", help="Action to be taken (generate-html, generate-slides, generate-pptx)")
+    parser.add_argument("--name", dest="name", help="Presentation name")
+    parser.add_argument("--url", dest="url", help="URL of html presentation")
+    parser.add_argument("--width", dest="width", help="Width of rendered slide image", default='1920')
+    parser.add_argument("--height", dest="height", help="Height of rendered slide image", default='1080')
 
-    parser.add_option( "--name",
-        dest="name",
-        help="presentation name")
+    args = parser.parse_args()
 
-    parser.add_option("--url",
-        dest="url",
-        help="URL of html presentation")
+    args.slug = slugify(args.name, separator="_")
+    args.directory_name = f"{args.slug}-{args.width}x{args.height}"
+    args.exec_path = os.path.dirname(__file__)
 
-
-
-    parser.add_option( "--width",
-        dest="width",
-        help="width of rendered slide image",
-        default='1920')
-
-    parser.add_option("--height",
-        dest="height",
-        help="height of rendered slide image",
-        default='1080')
-
-    (options, args) = parser.parse_args()
-
-    options.slug = slugify(unicode(options.name), separator="_")
-    options.directory_name = options.slug + "-"+options.width+"x"+options.height
-    options.exec_path = os.path.dirname(__file__)
-
-    if options.action == "generate-html":
+    if args.action == "generate-html":
         logging.info("Generating HTML")
-        cmd = "python "+options.exec_path+"/bigpy/big.py -s "+options.name +".md"
+        cmd = f"python3 {args.exec_path}/bigpy/big.py -s {args.name}.md"
+        subprocess.run(cmd, shell=True)
 
-        os.system(cmd)
-
-    elif options.action == "generate-slides":
+    elif args.action == "generate-slides":
         logging.info("Generating slide images")
-
         logging.debug("Settings")
-        logging.debug("\tName: "+options.name)
-        logging.debug("\tSlug: "+options.slug)
-        logging.debug("\tURL: "+options.url)
-        logging.debug("\tDirectory: "+options.directory_name)
-        logging.debug("\tImage dimensions: "+options.width + "x" + options.height)
+        logging.debug(f"\tName: {args.name}")
+        logging.debug(f"\tSlug: {args.slug}")
+        logging.debug(f"\tURL: {args.url}")
+        logging.debug(f"\tDirectory: {args.directory_name}")
+        logging.debug(f"\tImage dimensions: {args.width}x{args.height}")
 
-        logging.info("Downloading " + options.url)
-        logging.info("Saving images ")
+        logging.info(f"Downloading {args.url}")
+        logging.info("Saving images")
 
-        if not os.path.exists(options.directory_name):
-            os.makedirs(options.directory_name)
+        if not os.path.exists(args.directory_name):
+            os.makedirs(args.directory_name)
 
         logging.info("Launching renderer")
-        cmd = "node "+options.exec_path+"/big-renderer/renderer.js -f '" + options.url + "' --slideDir '"+options.directory_name+"' -w '"+options.width+"' -h '"+options.height+"' "
-        
-        os.system(cmd)
-    elif options.action == "generate-pptx":
+        cmd = f"python3 {args.exec_path}/big-renderer/renderer.py --presentationFile '{args.url}' --slideDir '{args.directory_name}' --width '{args.width}' --height '{args.height}'"
+        subprocess.run(cmd, shell=True)
+
+    elif args.action == "generate-pptx":
         logging.info("Generating PDF")
-        cmd = "python "+options.exec_path+"/big-pptx/images_to_pptx.py -r ./ -s ./"+options.directory_name+"/ --name "+options.name
-        os.system(cmd)
+        cmd = f"python3 {args.exec_path}/big-pptx/images_to_pptx.py -r ./ -s ./{args.directory_name}/ --name {args.name}"
+        subprocess.run(cmd, shell=True)
 
 
 if __name__ == '__main__':
