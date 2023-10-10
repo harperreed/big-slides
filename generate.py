@@ -7,7 +7,6 @@ from optparse import OptionParser
 import re
 import sys
 import os
-import urllib2
 
 from slugify import slugify
 
